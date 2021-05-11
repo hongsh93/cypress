@@ -1,19 +1,19 @@
 /* eslint-disable */
 
 const url = Cypress.config().baseUrl
-const segment_name = "e2e_test_number_segment"
-const segment_description = "e2e_test for number segment"
-const label_name = Cypress.config().number_label
+const segment_name = "e2e_test_boolean_segment"
+const segment_description = "e2e_test for boolean segment"
+const label_name = Cypress.config().boolean_label
 const game_code = "mherosgb"
 const id_type = "adid"
-const condition_value  = 123
-const condition_value2  = 456
+const condition_value  = "true"
+const condition_value2  = "false"
 
-describe('segment create test number', () => {
+describe('segment create test boolean', () => {
     beforeEach(() => {
     })
 
-    it('label with 2 and value condition', () => {
+    it('label with 2 or value condition', () => {
         cy.visit('/')
         cy.wait(5000)
         cy.get('[data-cy=세그먼트]').click()
@@ -33,15 +33,16 @@ describe('segment create test number', () => {
         // 레이블 조건 입력
         cy.get('[data-cy=add_value_condition_initial_0_0]').click()       // 조건 추가
         cy.get('[data-cy=value_value_sign_0_0_0_0]').parent().click()     // 조건 수식 변경
-        cy.get('[data-cy=value_value_sign_value_0_0_0_0]').eq(2).click()  // v-select에서 3번째 선택
-        cy.get('[data-cy=value_value_0_0_0_0]').click().type(condition_value)
+        cy.get('[data-cy=value_value_sign_value_0_0_0_0]').eq(1).click()  // v-select에서 2번째 선택
+        cy.get('[data-cy=value_value_0_0_0_0]').parent().click()
+        cy.get('[data-cy=value_value_value_0_0_0_0]').eq(0).click()  // v-select에서 1번째 선택
 
         cy.get('[data-cy=add_value_condition_0_0_0]').click()       // 조건 추가
-        cy.get('[data-cy=add_and_value_condition_0_0_0]').click()
-        cy.get('[data-cy=value_value_sign_0_0_0_1]').parent().click()     // 조건 수식 변경
-        cy.get('[data-cy=value_value_sign_value_0_0_0_1]').eq(3).click()  // v-select에서 4번째 선택
-        cy.get('[data-cy=value_value_0_0_0_1]').click().type(condition_value2)
-
+        cy.get('[data-cy=add_or_value_condition_0_0_0]').click()
+        cy.get('[data-cy=value_value_sign_0_0_1_0]').parent().click()     // 조건 수식 변경
+        cy.get('[data-cy=value_value_sign_value_0_0_1_0]').eq(0).click()  // v-select에서 4번째 선택
+        cy.get('[data-cy=value_value_0_0_1_0]').parent().click()
+        cy.get('[data-cy=value_value_value_0_0_1_0]').eq(1).click()  // v-select에서 2번째 선택
 
         // 생성
         cy.get('[data-cy=title_create]').click()
@@ -59,7 +60,7 @@ describe('segment create test number', () => {
                 expect(res.body.definitions[0].query_config.meta.idType).to.eq(id_type)
                 expect(res.body.definitions[0].query_config.meta.labelRelation).to.eq("(label_" + label_name + "#1)")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].label).to.eq(label_name)
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].dataType).to.eq("NUMBER")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].dataType).to.eq("BOOLEAN")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].gameCodes[0]).to.eq(game_code)
 
                 var label_id = res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].labelId
@@ -73,15 +74,15 @@ describe('segment create test number', () => {
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[1].segmentColumnInfos[0].column).to.eq("game_code")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[1].segmentColumnInfos[0].alias).to.eq(label_name + "_GAMECODE")
 
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].column).to.eq("SAFE_CAST(value AS FLOAT64)")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionOp).to.eq(">")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].column).to.eq("SAFE_CAST(value AS BOOL)")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionOp).to.eq("!=")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionValue).to.eq("" + condition_value + "")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].alias).to.eq(label_name)
 
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[1].column).to.eq("SAFE_CAST(value AS FLOAT64)")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[1].conditionOp).to.eq("<")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[1].conditionValue).to.eq("" + condition_value2 + "")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[1].alias).to.eq(label_name)
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[3].segmentColumnInfos[0].column).to.eq("SAFE_CAST(value AS BOOL)")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[3].segmentColumnInfos[0].conditionOp).to.eq("=")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[3].segmentColumnInfos[0].conditionValue).to.eq("" + condition_value2 + "")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[3].segmentColumnInfos[0].alias).to.eq(label_name)
             })
         }).as('segmentCreate')
         cy.wait('@segmentCreate', {requestTimeout: 20000})
@@ -90,9 +91,9 @@ describe('segment create test number', () => {
     })
 })
 
-describe('delete number segment', () => {
+describe('delete boolean segment', () => {
     var segment_id = 0
-    it('delete number label',  () => {
+    it('delete boolean label',  () => {
         cy.visit('/')
         cy.wait(5000)
         cy.intercept('POST', url + 'mgmt/segment/jobs', (req) => {

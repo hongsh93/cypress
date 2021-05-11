@@ -34,6 +34,7 @@ describe('segment create test string', () => {
         cy.get('[data-cy=value_value_sign_0_0_0_0]').parent().click()     // 조건 수식 변경
         cy.get('[data-cy=value_value_sign_value_0_0_0_0]').eq(1).click()  // v-select에서 2번째 선택
         cy.get('[data-cy=value_value_0_0_0_0]').click().type(condition_value)
+        cy.get('[data-cy=value_value_case_sensitive_0_0_0_0]').parent().click()
 
         // 생성
         cy.get('[data-cy=title_create]').click()
@@ -53,18 +54,25 @@ describe('segment create test string', () => {
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].label).to.eq(label_name)
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].dataType).to.eq("STRING")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].gameCodes[0]).to.eq(game_code)
+
+                var label_id = res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].labelId
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].startJobDate).to.eq("@JOBDATE-" + label_id)
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].timestamp).to.eq("@TIMESTAMP-" + label_id)
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].endJobDate).to.eq(null)
+
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[0].segmentColumnInfos[0].column).to.eq("LOWER(id)")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[0].segmentColumnInfos[0].alias).to.eq("id")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[0].segmentColumnInfos[1].column).to.eq("game_code")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[1].segmentColumnInfos[0].column).to.eq("game_code")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[1].segmentColumnInfos[0].alias).to.eq(label_name + "_GAMECODE")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].column).to.eq("LOWER(value)")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].column).to.eq("value")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].caseSensitive).to.eq(true)
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionOp).to.eq("!=")
-                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionValue).to.eq("LOWER('" + condition_value + "')")
+                expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].conditionValue).to.eq("'" + condition_value + "'")
                 expect(res.body.definitions[0].query_config.meta.segmentLabelQueryMetas[0].segmentColumnInfosList[2].segmentColumnInfos[0].alias).to.eq(label_name)
             })
         }).as('segmentCreate')
-        cy.wait('@segmentCreate')
+        cy.wait('@segmentCreate', {requestTimeout: 20000})
 
         cy.get('[data-cy=segment_create_after_close').click()
     })
